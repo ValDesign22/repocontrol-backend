@@ -14,7 +14,43 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid()) @map("_id")
-  email    String @unique
-  name     String
+  id         String  @id @default(uuid()) @map("_id")
+  email      String  @unique
+  login      String  @unique
+  avatar_url String
+  url        String  @unique
+  Repos      Repos[]
+}
+
+model Repos {
+  id      String   @id @default(uuid()) @map("_id")
+  name    String   @unique
+  private Boolean  @default(false)
+  owner   User     @relation(fields: [ownerId], references: [id])
+  ownerId String   @map("owner_id")
+  url     String   @unique
+  Issues  Issues[]
+  Pulls   Pulls[]
+}
+
+model Issues {
+  id     String @id @default(uuid()) @map("_id")
+  title  String
+  number Int    @unique
+  url    String @unique
+  repo   Repos  @relation(fields: [repoId], references: [id])
+  repoId String @map("repo_id")
+  state  String
+  body   String
+}
+
+model Pulls {
+  id     String @id @default(uuid()) @map("_id")
+  title  String
+  number Int    @unique
+  url    String @unique
+  repo   Repos  @relation(fields: [repoId], references: [id])
+  repoId String @map("repo_id")
+  state  String
+  body   String
 }
