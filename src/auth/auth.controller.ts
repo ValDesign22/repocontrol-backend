@@ -11,7 +11,7 @@ export class AuthController {
 
   @Get('/')
   async getAuth(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
-    const session = this.authService.getSession(req);
+    const session = await this.authService.getSession(req);
     if (session) {
       res.send({
         message: `Already logged in, welcome back ${session.user.login}`,
