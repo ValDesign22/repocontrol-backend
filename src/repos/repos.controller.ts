@@ -21,25 +21,18 @@ export class ReposController {
       return;
     }
 
-    const repos = await this.reposService.getReposWithToken(req);
+    const repos = await this.reposService.getRepos(req);
 
     if (!repos) {
       res.status(500).send({ message: 'An error occured' });
       return;
     }
     const data = await repos.json();
-    console.log(data.length);
-
-    // const installations = await this.authService.getInstallations(req);
-    // if (!installations) {
-    //   res.status(500).send({ message: 'An error occured' });
-    //   return;
-    // }
 
     res.send({ repos: data });
   }
 
-  @Get('/:repoId')
+  @Get('/:repoName')
   async getRepo(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
     const session = this.authService.getSession(req);
     if (!session) {
@@ -47,29 +40,21 @@ export class ReposController {
       return;
     }
 
-    const { repoId } = req.params as FastifyRequest['params'] & {
-      repoId: string;
+    const { repoName } = req.params as FastifyRequest['params'] & {
+      repoName: string;
     };
 
-    const repos = await this.reposService.getReposWithToken(req);
-
-    if (!repos) {
-      res.status(500).send({ message: 'An error occured' });
-      return;
-    }
-
-    const data = await repos.json();
-    const repo = data.find((repo: any) => repo.id === parseInt(repoId, 10));
+    const repo = await this.reposService.getRepo(req, repoName);
 
     if (!repo) {
       res.status(500).send({ message: 'An error occured' });
       return;
     }
 
-    res.send({ repo });
+    res.send({ repo: await repo.json() });
   }
 
-  @Get('/:repoId/issues')
+  @Get('/:repoName/issues')
   async getRepoIssues(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
     const session = this.authService.getSession(req);
     if (!session) {
@@ -77,34 +62,39 @@ export class ReposController {
       return;
     }
 
-    const { repoId } = req.params as FastifyRequest['params'] & {
-      repoId: string;
+    const { repoName } = req.params as FastifyRequest['params'] & {
+      repoName: string;
     };
 
-    const repos = await this.reposService.getReposWithToken(req);
+    const repoIssues = await this.reposService.getRepoIssues(req, repoName);
 
-    if (!repos) {
+    if (!repoIssues) {
       res.status(500).send({ message: 'An error occured' });
       return;
     }
 
-    const data = await repos.json();
-    const repo = data.find((repo: any) => repo.id === parseInt(repoId, 10));
+    res.send({ issues: await repoIssues.json() });
+  }
 
-    if (!repo) {
+  @Get('/:repoName/pulls')
+  async getRepoPulls(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
+    const session = this.authService.getSession(req);
+    if (!session) {
+      res.status(401).send({ message: 'Unauthorized' });
+      return;
+    }
+
+    const { repoName } = req.params as FastifyRequest['params'] & {
+      repoName: string;
+    };
+
+    const repoPulls = await this.reposService.getRepoPulls(req, repoName);
+
+    if (!repoPulls) {
       res.status(500).send({ message: 'An error occured' });
       return;
     }
 
-    const issues = await fetch(repo.issues_url.replace('{/number}', ''));
-
-    if (!issues) {
-      res.status(500).send({ message: 'An error occured' });
-      return;
-    }
-
-    const issuesData = await issues.json();
-
-    res.send({ issues: issuesData });
+    res.send({ pulls: await repoPulls.json() });
   }
 }
