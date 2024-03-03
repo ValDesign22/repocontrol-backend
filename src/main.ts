@@ -5,11 +5,12 @@ import {
   FastifyAdapter,
 } from '@nestjs/platform-fastify';
 import secureSession from '@fastify/secure-session';
+import { VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ logger: true }),
+    new FastifyAdapter({ logger: false }),
   );
 
   await app.register(secureSession, {
@@ -19,6 +20,10 @@ async function bootstrap() {
     cookie: {
       secure: false,
     },
+  });
+
+  app.enableVersioning({
+    type: VersioningType.URI,
   });
 
   await app.listen(3001);

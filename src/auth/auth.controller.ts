@@ -2,7 +2,10 @@ import { Controller, Get, Req, Res } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthService } from './auth.service';
 
-@Controller('api/auth')
+@Controller({
+  version: '1',
+  path: 'api/auth',
+})
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -11,8 +14,9 @@ export class AuthController {
     const session = this.authService.getSession(req);
     if (session) {
       console.log(session);
+
       res.send({
-        message: `Already logged in, welcome back ${session.login}`,
+        message: `Already logged in, welcome back ${session.user.login}`,
       });
       return;
     }
@@ -28,48 +32,21 @@ export class AuthController {
       return;
     }
 
-    const userInfos = await this.authService.getAuth(code);
+    const auth = await this.authService.getAuth(code);
 
-    if (!userInfos) {
+    if (!auth) {
       res.send({ message: 'An error occured' });
       return;
     }
 
-    console.log(userInfos);
+    this.authService.setSession(req, auth);
 
-    this.authService.setSession(req, userInfos);
-
-    res.send({ message: `Welcome ${userInfos.login}` });
+    res.send({ message: `Welcome ${auth.user.login}` });
   }
 
   @Get('/logout')
   async logout(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
     this.authService.deleteSession(req);
     res.send({ message: 'Logged out' });
-  }
-
-  @Get('/repos')
-  async getRepos(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
-    const session = this.authService.getSession(req);
-    if (!session) {
-      res.status(401).send({ message: 'Unauthorized' });
-      return;
-    }
-
-    const repos = await this.authService.getReposWithToken(req);
-
-    if (!repos) {
-      res.send({ message: 'An error occured' });
-      return;
-    }
-
-    const data = await repos.json();
-
-    if (data.length === 0) {
-      res.send({ message: 'No repositories found' });
-      return;
-    }
-
-    res.send({ data });
   }
 }

@@ -20,19 +20,26 @@ export class AuthService {
     const params = new URLSearchParams(data);
     const token = params.get('access_token');
 
-    if (!token) {
-      return null;
-    }
+    if (!token) return null;
 
     const userRes = await fetch('https://api.github.com/user', {
       headers: {
-        Authorization: `token ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    const userInfos = await userRes.json();
+    if (!userRes.ok) {
+      console.log('An error occured');
+      console.log(userRes);
+      return null;
+    }
 
-    return userInfos;
+    const user = await userRes.json();
+
+    console.log(user);
+    console.log(token);
+
+    return { user, token };
   }
 
   deleteSession(req: FastifyRequest) {
@@ -47,12 +54,25 @@ export class AuthService {
     return req.session.get('userInfos');
   }
 
-  getReposWithToken(req: FastifyRequest) {
+  async getInstallations(req: FastifyRequest) {
     const session = this.getSession(req);
-    if (!session) {
+    if (!session) return null;
+
+    const res = await fetch(
+      `https://api.github.com/users/${session.user.login}/installations`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.token}`,
+        },
+      },
+    );
+
+    if (!res.ok) {
+      console.log('An error occured');
+      console.log(res);
       return null;
     }
 
-    return fetch(`https://api.github.com/users/${session.login}/repos`);
+    return res;
   }
 }
