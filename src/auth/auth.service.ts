@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
+import { UserService } from 'src/prisma/user.service';
 
 @Injectable()
 export class AuthService {
+  constructor(private userService: UserService) {}
+
   async getAuth(code: string) {
     const res = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
@@ -36,43 +39,42 @@ export class AuthService {
 
     const user = await userRes.json();
 
-    console.log(user);
-    console.log(token);
+    this.userService.createUser({
+      login: user.login,
+      id: user.id,
+      avatar_url: user.avatar_url,
+      email: user.email,
+      url: user.html_url,
+    });
 
     return { user, token };
-  }
-
-  deleteSession(req: FastifyRequest) {
-    req.session.delete();
   }
 
   setSession(req: FastifyRequest, userInfos: any) {
     req.session.set('userInfos', userInfos);
   }
 
-  getSession(req: FastifyRequest) {
-    return req.session.get('userInfos');
-  }
+  async getSession(req: FastifyRequest) {
+    const session = req.session.get('userInfos');
 
-  async getInstallations(req: FastifyRequest) {
-    const session = this.getSession(req);
-    if (!session) return null;
+    const dbUser = await this.userService.getUser({
+      id: req.session.get('userInfos').user.id,
+    });
 
-    const res = await fetch(
-      `https://api.github.com/users/${session.user.login}/installations`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.token}`,
-        },
-      },
-    );
-
-    if (!res.ok) {
-      console.log('An error occured');
-      console.log(res);
-      return null;
+    if (!dbUser) {
+      await this.userService.createUser({
+        login: session.user.login,
+        id: session.user.id,
+        avatar_url: session.user.avatar_url,
+        email: session.user.email,
+        url: session.user.html_url,
+      });
     }
 
-    return res;
+    return session;
+  }
+
+  deleteSession(req: FastifyRequest) {
+    req.session.delete();
   }
 }
