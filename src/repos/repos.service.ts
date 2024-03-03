@@ -6,14 +6,11 @@ export class ReposService {
   async getReposWithToken(req: FastifyRequest) {
     const session = req.session.get('userInfos');
     if (!session) return null;
-    const res = await fetch(
-      `https://api.github.com/repos/${session.user.login}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.token}`,
-        },
+    const res = await fetch(`https://api.github.com/user/repos`, {
+      headers: {
+        Authorization: `Bearer ${session.token}`,
       },
-    );
+    });
 
     if (!res.ok) {
       console.log('An error occured while fetching repos');
