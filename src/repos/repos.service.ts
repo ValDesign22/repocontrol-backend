@@ -7,7 +7,7 @@ export class ReposService {
     const session = req.session.get('userInfos');
     if (!session) return null;
     const res = await fetch(
-      `https://api.github.com/users/${session.user.login}/repos?type=all`,
+      `https://api.github.com/repos/${session.user.login}`,
       {
         headers: {
           Authorization: `Bearer ${session.token}`,
