@@ -26,7 +26,7 @@ export class AuthController {
       res
         .status(302)
         .redirect(
-          `https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}`,
+          `https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}`,
         );
       return;
     }
