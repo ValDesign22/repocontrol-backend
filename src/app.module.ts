@@ -6,6 +6,7 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { ReposController } from './repos/repos.controller';
 import { ReposService } from './repos/repos.service';
+import { WebhookController } from './webhook/webhook.controller';
 
 @Module({
   imports: [
@@ -13,7 +14,12 @@ import { ReposService } from './repos/repos.service';
       isGlobal: true,
     }),
   ],
-  controllers: [AppController, AuthController, ReposController],
+  controllers: [
+    AppController,
+    AuthController,
+    ReposController,
+    WebhookController,
+  ],
   providers: [AppService, AuthService, ReposService],
 })
 export class AppModule {}
