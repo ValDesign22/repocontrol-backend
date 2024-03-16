@@ -8,6 +8,7 @@ import { ReposController } from './repos/repos.controller';
 import { ReposService } from './repos/repos.service';
 import { WebhookController } from './webhook/webhook.controller';
 import { WebhookService } from './webhook/webhook.service';
+import { WebhookGateway } from './webhook/webhook.gateway';
 
 @Module({
   imports: [
@@ -21,6 +22,12 @@ import { WebhookService } from './webhook/webhook.service';
     ReposController,
     WebhookController,
   ],
-  providers: [AppService, AuthService, ReposService, WebhookService],
+  providers: [
+    AppService,
+    AuthService,
+    ReposService,
+    WebhookService,
+    WebhookGateway,
+  ],
 })
 export class AppModule {}
