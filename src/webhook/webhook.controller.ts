@@ -1,6 +1,10 @@
 import { Controller, Post, Req, Res } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { GithubEvent, WebhookService } from './webhook.service';
+import {
+  GithubEvent,
+  GithubEventAction,
+  WebhookService,
+} from './webhook.service';
 
 @Controller({
   version: '1',
@@ -24,13 +28,12 @@ export class WebhookController {
 
     const githubEvent = req.headers['x-github-event'] as GithubEvent;
     if (githubEvent === GithubEvent.Push) {
-      console.log('Push event received');
       const data = req.body;
       console.log(data);
     } else if (githubEvent === GithubEvent.Issues) {
-      console.log('Issue event received');
-      const data = req.body;
-      console.log(data);
+      const data: any = req.body;
+      const action = data.action as GithubEventAction;
+      console.log(`Action ${action} not supported`);
     }
     res.send({ message: 'Webhook received' });
   }

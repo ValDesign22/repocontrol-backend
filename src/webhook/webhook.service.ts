@@ -75,6 +75,20 @@ export enum GithubEvent {
   WorkflowRun = 'workflow_run',
 }
 
+export enum GithubEventAction {
+  Added = 'added',
+  Assigned = 'assigned',
+  Cancelled = 'cancelled',
+  Closed = 'closed',
+  Completed = 'completed',
+  Created = 'created',
+  Deleted = 'deleted',
+  Opened = 'opened',
+  ReOpened = 'reopened',
+  Unassigned = 'unassigned',
+  Unlabelled = 'unlabelled',
+}
+
 @Injectable()
 export class WebhookService {
   async verifyWebhookSignature(req: FastifyRequest, secret: string) {
