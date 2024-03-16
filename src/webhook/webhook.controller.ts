@@ -12,10 +12,10 @@ export class WebhookController {
   @Post('/')
   async getWebhook(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
     if (
-      !this.webhookService.verifyWebhookSignature(
+      !(await this.webhookService.verifyWebhookSignature(
         req,
         process.env.GITHUB_WEBHOOK_SECRET!,
-      )
+      ))
     ) {
       res.code(401);
       res.send({ message: 'Unauthorized' });

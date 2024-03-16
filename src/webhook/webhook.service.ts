@@ -78,6 +78,9 @@ export enum GithubEvent {
 @Injectable()
 export class WebhookService {
   async verifyWebhookSignature(req: FastifyRequest, secret: string) {
+    if (!req.headers['x-hub-signature-256']) {
+      return false;
+    }
     const signature = crypto
       .createHmac('sha256', secret)
       .update(JSON.stringify(req.body))
