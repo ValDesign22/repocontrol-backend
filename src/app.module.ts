@@ -7,6 +7,7 @@ import { AuthService } from './auth/auth.service';
 import { ReposController } from './repos/repos.controller';
 import { ReposService } from './repos/repos.service';
 import { WebhookController } from './webhook/webhook.controller';
+import { WebhookService } from './webhook/webhook.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { WebhookController } from './webhook/webhook.controller';
     ReposController,
     WebhookController,
   ],
-  providers: [AppService, AuthService, ReposService],
+  providers: [AppService, AuthService, ReposService, WebhookService],
 })
 export class AppModule {}
