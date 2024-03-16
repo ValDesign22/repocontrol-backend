@@ -1,6 +1,6 @@
 import { Controller, Post, Req, Res } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { WebhookService } from './webhook.service';
+import { GithubEvent, WebhookService } from './webhook.service';
 
 @Controller({
   version: '1',
@@ -11,7 +11,6 @@ export class WebhookController {
 
   @Post('/')
   async getWebhook(@Req() req: FastifyRequest, @Res() res: FastifyReply) {
-    console.log(process.env.GITHUB_WEBHOOK_SECRET!);
     if (
       !this.webhookService.verifyWebhookSignature(
         req,
@@ -23,9 +22,13 @@ export class WebhookController {
       return;
     }
 
-    const githubEvent = req.headers['x-github-event'];
-    if (githubEvent === 'push') {
+    const githubEvent = req.headers['x-github-event'] as GithubEvent;
+    if (githubEvent === GithubEvent.Push) {
       console.log('Push event received');
+      const data = req.body;
+      console.log(data);
+    } else if (githubEvent === GithubEvent.Issues) {
+      console.log('Issue event received');
       const data = req.body;
       console.log(data);
     }
