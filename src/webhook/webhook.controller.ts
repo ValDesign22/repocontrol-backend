@@ -28,8 +28,16 @@ export class WebhookController {
 
     const githubEvent = req.headers['x-github-event'] as GithubEvent;
     if (githubEvent === GithubEvent.Push) {
-      const data = req.body;
+      const data: any = req.body;
       console.log(data);
+      const { ref, repository, pusher, commits } = data;
+      const commitsCount = typeof commits === 'object' ? commits.length : 0;
+      const commitsIds = typeof commits === 'object' ? commits.map((c: any) => c.id) : [];
+      console.log(`
+        Push event to ${ref} in repository ${repository.full_name} by ${pusher.name}
+        With ${commitsCount} commits
+        Commits: ${commitsIds.join(', ')}
+      `);
     } else if (githubEvent === GithubEvent.Issues) {
       const data: any = req.body;
       const action = data.action as GithubEventAction;
