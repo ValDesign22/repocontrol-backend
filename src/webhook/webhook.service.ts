@@ -83,6 +83,7 @@ export enum GithubEventAction {
   Completed = 'completed',
   Created = 'created',
   Deleted = 'deleted',
+  Labelled = 'labelled',
   Opened = 'opened',
   ReOpened = 'reopened',
   Unassigned = 'unassigned',
