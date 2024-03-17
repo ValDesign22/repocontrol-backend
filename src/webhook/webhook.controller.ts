@@ -32,7 +32,8 @@ export class WebhookController {
       console.log(data);
       const { ref, repository, pusher, commits } = data;
       const commitsCount = typeof commits === 'object' ? commits.length : 0;
-      const commitsIds = typeof commits === 'object' ? commits.map((c: any) => c.id) : [];
+      const commitsIds =
+        typeof commits === 'object' ? commits.map((c: any) => c.id) : [];
       console.log(`
         Push event to ${ref} in repository ${repository.full_name} by ${pusher.name}
         With ${commitsCount} commits
